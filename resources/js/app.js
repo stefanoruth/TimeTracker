@@ -13,6 +13,9 @@ window.Vue = Vue
 Vue.use(VueRouter)
 Vue.config.productionTip = false
 
+import App from './views/App'
+import Home from './views/Home'
+
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue
@@ -33,9 +36,15 @@ Vue.config.productionTip = false
 if (document.getElementById('app')) {
 	const app = new Vue({
 		el: '#app',
+		components: { App },
 		router: new VueRouter({
 			mode: 'history',
-			routes: require('./routes.js'),
+			routes: [
+				{
+					path: '/',
+					component: Home,
+				},
+			],
 		}),
 	})
 }
