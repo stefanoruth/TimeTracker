@@ -11,6 +11,13 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+// Auth
+Route::get('logout', 'AuthController@logout')->middleware('auth')->name('logout');
+Route::get('login', 'AuthController@redirectToProvider')->middleware('guest');
+Route::get('login/callback', 'AuthController@handleProviderCallback')->middleware('guest');
+// App
+Route::middleware('auth')->prefix('api')->group(function () {
+    //
 });
+// Public
+Route::get('{uri}', 'MainController@index')->name('login')->where('uri', '^(?:(?!api).*)');
