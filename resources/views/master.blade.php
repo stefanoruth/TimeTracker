@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="{{ mix('app.css') }}">
 </head>
 
-<body class="font-sans bg-grey-lighter text-black">
+<body class="">
     @yield('body')
     <noscript>
         For full functionality of this site it is necessary to enable JavaScript.
