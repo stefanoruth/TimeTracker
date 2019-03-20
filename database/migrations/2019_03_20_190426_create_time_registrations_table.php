@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateTimeRegirationsTable extends Migration
+class CreateTimeRegistrationsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateTimeRegirationsTable extends Migration
      */
     public function up()
     {
-        Schema::create('time_regirations', function (Blueprint $table) {
+        Schema::create('time_registrations', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->bigInteger('user_id')->unsigned();
             $table->time('start')->nullable();
@@ -36,6 +36,6 @@ class CreateTimeRegirationsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('time_regirations');
+        Schema::dropIfExists('time_registrations');
     }
 }

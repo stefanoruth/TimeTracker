@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class MainController
 {
@@ -13,10 +14,15 @@ class MainController
      */
     public function index()
     {
-        if (\Auth::check()) {
+        if (Auth::check()) {
             return view('app');
         }
 
         return view('welcome');
+    }
+
+    public function authUser()
+    {
+        return Auth::user();
     }
 }

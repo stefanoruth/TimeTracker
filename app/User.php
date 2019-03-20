@@ -36,8 +36,8 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function times()
+    public function timeRegistrations()
     {
-        return $this->hasMany(TimeRegiration::class);
+        return $this->hasMany(TimeRegistration::class);
     }
 }
