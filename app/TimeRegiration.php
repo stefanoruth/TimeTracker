@@ -9,5 +9,5 @@ class TimeRegiration extends Model
 {
     use SoftDeletes;
     protected $guarded = [];
-    protected $casts = []
+    protected $casts = [];
 }
