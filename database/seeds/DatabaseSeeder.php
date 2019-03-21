@@ -11,7 +11,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $user = factory(App\User::class)->create();
+        $user = factory(App\User::class)->create(['email' => 'stefano6262@gmail.com']);
 
         $dates = [
             [
@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
             [
                 'start' => '08:00',
                 'end' => '16:00',
-                'date' => date('Y-m-d', strtotime('thursday last week')),
+                'date' => date('Y-m-d', strtotime('tuesday last week')),
             ],
             [
                 'start' => '08:00',
@@ -52,27 +52,27 @@ class DatabaseSeeder extends Seeder
             [
                 'start' => '08:00',
                 'end' => '16:00',
-                'date' => date('Y-m-d', strtotime('monday last week')),
+                'date' => date('Y-m-d', strtotime('monday this week')),
             ],
             [
                 'start' => '08:00',
                 'end' => '16:00',
-                'date' => date('Y-m-d', strtotime('thursday last week')),
+                'date' => date('Y-m-d', strtotime('thursday this week')),
             ],
             [
                 'start' => '08:00',
                 'end' => '16:00',
-                'date' => date('Y-m-d', strtotime('thursday last week')),
+                'date' => date('Y-m-d', strtotime('thursday this week')),
             ],
             [
                 'start' => '09:00',
                 'end' => '12:00',
-                'date' => date('Y-m-d', strtotime('thursday last week')),
+                'date' => date('Y-m-d', strtotime('thursday this week')),
             ],
             [
                 'start' => '08:00',
                 'end' => '16:00',
-                'date' => date('Y-m-d', strtotime('friday last week')),
+                'date' => date('Y-m-d', strtotime('friday this week')),
             ],
         ];
 

@@ -13,6 +13,12 @@ class TimeRegistration extends Model
 
     public function getTimeAttribute()
     {
-        return date('H:i', strtotime($this->end) - strtotime($this->start));
+        $start = strtotime($this->start);
+
+        if ($this->include_lunch == 1) {
+            $start += 60*30;
+        }
+
+        return date('H:i', strtotime($this->end) - $start);
     }
 }
