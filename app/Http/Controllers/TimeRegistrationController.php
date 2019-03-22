@@ -53,4 +53,42 @@ class TimeRegistrationController extends Controller
             $date->startOfWeek()->addDay(6)->format('Y-m-d') => 'Søndag',
         ]);
     }
+
+    public function store(Request $request)
+    {
+        $data = $request->validate([
+            'start' => 'required|date_format:H:i',
+            'end' => 'required|date_format:H:i',
+            'date' => 'required|date_format:Y-m-d',
+            'note' => 'nullable',
+            'vacation' => 'required|boolean',
+            'lunch' => 'required|boolean',
+        ]);
+
+        return Auth::user()->timeRegistrations()->create(
+            $data
+        );
+    }
+
+    public function update(Request $request)
+    {
+        $data = $request->validate([
+            'id' =>'required|integer',
+            'start' => 'required|date_format:H:i',
+            'end' => 'required|date_format:H:i',
+            'date' => 'required|date_format:Y-m-d',
+            'note' => 'nullable',
+            'vacation' => 'required|boolean',
+            'lunch' => 'required|boolean',
+        ]);
+
+        return Auth::user()->timeRegistrations()->where('id', $data['id'])->update($data);
+    }
+
+    public function destroy(Request $request)
+    {
+        $data = $request->validate(['id' => 'required|integer']);
+
+        return Auth::user()->timeRegistrations()->delete($data['id']);
+    }
 }

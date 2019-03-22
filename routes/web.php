@@ -1,5 +1,7 @@
 <?php
 
+\Auth::loginUsingId(1);
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -18,7 +20,7 @@ Route::get('login/callback', 'AuthController@handleProviderCallback')->middlewar
 // App
 Route::middleware('auth')->prefix('api')->group(function () {
     Route::get('auth', 'MainController@authUser')->name('auth');
-    Route::resource('time', 'TimeRegistrationController');
+    Route::apiResource('time', 'TimeRegistrationController');
 });
 // Public
 Route::get('{uri}', 'MainController@index')->name('login')->where('uri', '^(?:(?!api).*)');
