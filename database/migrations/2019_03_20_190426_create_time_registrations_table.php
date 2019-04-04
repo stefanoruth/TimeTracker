@@ -18,6 +18,7 @@ class CreateTimeRegistrationsTable extends Migration
             $table->bigInteger('user_id')->unsigned();
             $table->time('start')->nullable();
             $table->time('end')->nullable();
+            $table->time('time')->nullable();
             $table->date('date')->nullable();
             $table->boolean('vacation')->default(0);
             $table->boolean('include_lunch')->default(1);

@@ -9,16 +9,19 @@ class TimeRegistration extends Model
 {
     use SoftDeletes;
     protected $guarded = [];
-    protected $appends = ['time'];
 
-    public function getTimeAttribute()
+    protected static function boot()
     {
-        $start = strtotime($this->start);
+        parent::boot();
 
-        if ($this->include_lunch == 1) {
-            $start += 60*30;
-        }
+        static::saving(function ($item) {
+            $start = strtotime($item->start);
 
-        return date('H:i', strtotime($this->end) - $start);
+            if ($item->include_lunch) {
+                $start += 60 * 30;
+            }
+
+            $item->time = date('H:i', strtotime($item->end) - $start);
+        });
     }
 }

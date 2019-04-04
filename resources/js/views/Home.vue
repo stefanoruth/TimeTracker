@@ -1,25 +1,27 @@
 <template>
     <div class="flex flex-col h-full">
+        <input type="week" v-model="input">
+
         <div class="flex-1 container mx-auto px-2">
-            <div v-for="(date, key) in dates" :key="key">
+            <div v-for="(item, key) in dates" :key="key" class="border-b">
                 <div class="flex justify-between">
-                    <div>{{date.day}}</div>
-                    <div>Timer: {{date.total}}</div>
+                    <div class="text-xl">{{item.weekDay}}</div>
+                    <div>Timer: {{item.totalTime}}</div>
                 </div>
                 <div>
-                    <div v-for="(entry, i) in date.hours" :key="i" class="flex">
-                        <div>{{entry.start}}</div>
-                        <div>{{entry.end}}</div>
-                        <div>{{entry.note}}</div>
-                        <div class="self-end">{{entry.time}}</div>
+                    <div v-for="(entry, i) in item.registrations" :key="i" class="flex">
+                        <div class="flex-1">{{entry.start}}</div>
+                        <div class="flex-1">{{entry.end}}</div>
+                        <div class="flex-1">{{entry.note}}</div>
+                        <div class="flex-1 self-end">{{entry.time}}</div>
                     </div>
                 </div>
             </div>
         </div>
         <footer class="border-t">
             <div class="container mx-auto flex text-center text-xl">
-                <div class="flex-1 p-2 border-r">Arbejdstimer: 20 timer</div>
-                <div class="flex-1 p-2">Flex Saldo: 8 timer</div>
+                <div class="flex-1 p-2 border-r">Arbejdstimer: {{weekHours}} timer</div>
+                <div class="flex-1 p-2">Flex Saldo: {{flex}} timer</div>
             </div>
         </footer>
     </div>
@@ -28,51 +30,48 @@
 <script>
 export default {
 	data: () => ({
-		dates: [
-			{
-				day: 'Mandag',
-				total: 7.5,
-				hours: [
-					{
-						start: '08:00',
-						end: '16:00',
-						time: 7.5,
-						note: 'Woool',
-					},
-				],
-			},
-			{
-				day: 'Tirsdag',
-				total: 0,
-				hours: [],
-			},
-			{
-				day: 'Onsdag',
-				total: 0,
-				hours: [],
-			},
-			{
-				day: 'Torsdag',
-				total: 0,
-				hours: [],
-			},
-			{
-				day: 'Freday',
-				total: 0,
-				hours: [],
-			},
-			{
-				day: 'Lørdag',
-				total: 0,
-				hours: [],
-			},
-			{
-				day: 'Søndag',
-				total: 0,
-				hours: [],
-			},
-		],
+		input: null,
+		weekHours: 0,
+		flex: 0,
+		dates: [],
 	}),
+
+	watch: {
+		input: function(val, oldVal) {
+			if (oldVal === null) {
+				return
+			}
+			const d = val.split('-W')
+
+			axios.get(route('time.index', { week: d[1], year: d[0] })).then(res => {
+				this.dates = res.data.time
+				this.weekHours = res.data.weekHours
+			})
+		},
+	},
+
+	mounted() {
+		this.load()
+	},
+
+	methods: {
+		delete(id) {
+			axios.delete(route('time.destroy', { id })).then(() => this.load())
+		},
+
+		update() {},
+
+		create() {},
+
+		async load() {
+			return axios.get(route('time.index')).then(res => {
+				this.input = res.data.year + '-W' + res.data.week
+				this.weekHours = res.data.weekHours
+				this.flex = res.data.flex
+				this.dates = res.data.time
+			})
+		},
+	},
 }
 </script>
 

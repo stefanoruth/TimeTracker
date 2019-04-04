@@ -34,10 +34,39 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'settings' => 'object',
     ];
 
     public function timeRegistrations()
     {
         return $this->hasMany(TimeRegistration::class);
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($user) {
+            $user->settings = User::baseSettings();
+        });
+    }
+
+    public static function baseSettings()
+    {
+        return [
+            'launch' => 30, // min
+            'work' => 2250, // 37h 30min
+            'start' => '08:00',
+            'end' => '16:00',
+            'days' => [ // Working days
+                'monday' => true,
+                'tuesday' => true,
+                'wednesday' => true,
+                'thursday' => true,
+                'friday' => true,
+                'saturday' => false,
+                'sunday' => false,
+            ],
+        ];
     }
 }
