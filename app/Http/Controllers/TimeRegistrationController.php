@@ -35,8 +35,10 @@ class TimeRegistrationController extends Controller
 
 
             return array_merge($item, [
-                'totalTime' => date('H:i', $entries->where('vacation', 0)->sum(function ($entry) {
-                    return strtotime($entry->time);
+                'totalTime' => $this->formatTime($entries->where('vacation', 0)->sum(function ($entry) {
+                    [$hours, $min] = explode(':', $entry->time);
+                    dump($hours, $min);
+                    return $hours * 60 + $min;
                 })),
                 'registrations' => $entries,
             ]);
@@ -57,21 +59,29 @@ class TimeRegistrationController extends Controller
         $query = $user->timeRegistrations()->select(DB::raw("SUM(DATE_FORMAT(time, '%k')*60+DATE_FORMAT(time, '%i')) as flex"));
         $workedTime = (clone $query)->where('vacation', 0)->value('flex');
         $vecationTime = (clone $query)->where('vacation', 1)->value('flex');
-        dump($workedTime, $vecationTime, $user->settings);
+
+        $workTimeThisWeek = Collection::make($user->settings->days)->map(function ($active, $day) {
+            return compact('day', 'active');
+        })->map(function ($item, $key) use ($user) {
+            if (!$item['active']) {
+                return 0;
+            }
+
+            if (date('N') > $key) {
+                return 0;
+            }
+
+            return $user->workPrDay();
+        })->sum();
 
         $weeksSignedUp = $user->created_at->diffInWeeks(Carbon::now());
-        $shouldWorkedMins = $user->settings->work * $weeksSignedUp + 0;
+        $shouldWorkedMins = $user->settings->work * $weeksSignedUp + $workTimeThisWeek;
+
         $workedMins = $workedTime + $vecationTime;
-
-
-        dump($shouldWorkedMins, $workedMins);
 
         $flex = $workedMins - $shouldWorkedMins;
 
-        $hours = $flex / 60;
-        $minutes = $flex % 60;
-
-        return sprintf('%02d:%02d', $hours, $minutes);
+        return $this->formatTime($flex);
     }
 
     public function weekHours(Collection $days)
@@ -82,10 +92,15 @@ class TimeRegistrationController extends Controller
             return $hours * 60 + $min;
         });
 
-        $hours = $totalWeek / 60;
-        $minutes = $totalWeek % 60;
+        return $this->formatTime($totalWeek);
+    }
 
-        return sprintf('%02d:%02d', $hours, $minutes);
+    public function formatTime($min)
+    {
+        $hours = $min / 60;
+        $minutes = $min % 60;
+
+        return sprintf('%02d:%02d', $hours, abs($minutes));
     }
 
     public function buildWeek(Carbon $date)
@@ -109,7 +124,7 @@ class TimeRegistrationController extends Controller
             'date' => 'required|date_format:Y-m-d',
             'note' => 'nullable',
             'vacation' => 'required|boolean',
-            'lunch' => 'required|boolean',
+            'include_lunch' => 'required|boolean',
         ]);
 
         return Auth::user()->timeRegistrations()->create(
@@ -117,25 +132,8 @@ class TimeRegistrationController extends Controller
         );
     }
 
-    public function update(Request $request)
+    public function destroy($id)
     {
-        $data = $request->validate([
-            'id' =>'required|integer',
-            'start' => 'required|date_format:H:i',
-            'end' => 'required|date_format:H:i',
-            'date' => 'required|date_format:Y-m-d',
-            'note' => 'nullable',
-            'vacation' => 'required|boolean',
-            'lunch' => 'required|boolean',
-        ]);
-
-        return Auth::user()->timeRegistrations()->where('id', $data['id'])->update($data);
-    }
-
-    public function destroy(Request $request)
-    {
-        $data = $request->validate(['id' => 'required|integer']);
-
-        return Auth::user()->timeRegistrations()->delete($data['id']);
+        return Auth::user()->timeRegistrations()->where('id', $id)->delete();
     }
 }

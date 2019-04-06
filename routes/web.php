@@ -20,7 +20,7 @@ Route::get('login/callback', 'AuthController@handleProviderCallback')->middlewar
 // App
 Route::middleware('auth')->prefix('api')->group(function () {
     Route::get('auth', 'MainController@authUser')->name('auth');
-    Route::apiResource('time', 'TimeRegistrationController');
+    Route::apiResource('time', 'TimeRegistrationController')->only('index', 'store', 'destroy');
 });
 // Public
 Route::get('{uri}', 'MainController@index')->name('login')->where('uri', '^(?:(?!api).*)');

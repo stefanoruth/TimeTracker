@@ -6,6 +6,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Collection;
 
 class User extends Authenticatable
 {
@@ -51,10 +52,15 @@ class User extends Authenticatable
         });
     }
 
+    public function workPrDay()
+    {
+        return $this->settings->work / Collection::make($this->settings->days)->filter()->count();
+    }
+
     public static function baseSettings()
     {
         return [
-            'launch' => 30, // min
+            'lunch' => 30, // min
             'work' => 2250, // 37h 30min
             'start' => '08:00',
             'end' => '16:00',
