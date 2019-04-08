@@ -56,18 +56,18 @@ class TimeRegistrationController extends Controller
     public function flex()
     {
         $user = Auth::user();
-        $query = $user->timeRegistrations()->select(DB::raw("SUM(DATE_FORMAT(time, '%k')*60+DATE_FORMAT(time, '%i')) as flex"));
-        $workedTime = (clone $query)->where('vacation', 0)->value('flex');
-        $vecationTime = (clone $query)->where('vacation', 1)->value('flex');
+        $timeRegistered = $user->timeRegistrations()->select(DB::raw("SUM(DATE_FORMAT(time, '%k')*60+DATE_FORMAT(time, '%i')) as flex"))->whereDate('date', '!=', date('Y-m-d'))->value('flex');
+        $week = [1=>'monday', 2=>'tuesday', 3=>'wednesday', 4=>'thursday', 5=>'friday', 6=>'saturday', 7=>'sunday'];
 
         $workTimeThisWeek = Collection::make($user->settings->days)->map(function ($active, $day) {
             return compact('day', 'active');
-        })->map(function ($item, $key) use ($user) {
+        })->map(function ($item) use ($user, $week) {
+            $i = array_search($item['day'], $week);
+
             if (!$item['active']) {
                 return 0;
             }
-
-            if (date('N') > $key) {
+            if (intval(date('N')) <= $i) {
                 return 0;
             }
 
@@ -75,11 +75,10 @@ class TimeRegistrationController extends Controller
         })->sum();
 
         $weeksSignedUp = $user->created_at->diffInWeeks(Carbon::now());
+        dump($weeksSignedUp, $workTimeThisWeek);
         $shouldWorkedMins = $user->settings->work * $weeksSignedUp + $workTimeThisWeek;
 
-        $workedMins = $workedTime + $vecationTime;
-
-        $flex = $workedMins - $shouldWorkedMins;
+        $flex = $timeRegistered - $shouldWorkedMins;
 
         return $this->formatTime($flex);
     }
