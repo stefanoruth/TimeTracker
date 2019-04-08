@@ -75,7 +75,6 @@ class TimeRegistrationController extends Controller
         })->sum();
 
         $weeksSignedUp = $user->created_at->diffInWeeks(Carbon::now());
-        dump($weeksSignedUp, $workTimeThisWeek);
         $shouldWorkedMins = $user->settings->work * $weeksSignedUp + $workTimeThisWeek;
 
         $flex = $timeRegistered - $shouldWorkedMins;
