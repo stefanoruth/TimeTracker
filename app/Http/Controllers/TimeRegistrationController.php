@@ -37,7 +37,7 @@ class TimeRegistrationController extends Controller
             return array_merge($item, [
                 'totalTime' => $this->formatTime($entries->where('vacation', 0)->sum(function ($entry) {
                     [$hours, $min] = explode(':', $entry->time);
-                    dump($hours, $min);
+
                     return $hours * 60 + $min;
                 })),
                 'registrations' => $entries,
