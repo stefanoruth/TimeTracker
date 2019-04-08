@@ -8,6 +8,7 @@ require('./bootstrap')
 
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import route from '../../vendor/tightenco/ziggy/src/js/route'
 window.Vue = Vue
 
 Vue.use(VueRouter)
@@ -15,6 +16,12 @@ Vue.config.productionTip = false
 
 import App from './views/App'
 import Home from './views/Home'
+
+Vue.mixin({
+	methods: {
+		route: route,
+	},
+})
 
 /**
  * The following block of code may be used to automatically register your

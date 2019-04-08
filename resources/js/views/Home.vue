@@ -84,7 +84,7 @@ export default {
 			}
 			const d = val.split('-W')
 
-			axios.get(route('time.index', { week: d[1], year: d[0] })).then(res => {
+			axios.get(this.route('time.index', { week: d[1], year: d[0] })).then(res => {
 				this.setData(res.data)
 			})
 		},
@@ -105,15 +105,15 @@ export default {
 
 	methods: {
 		destroy(id) {
-			axios.delete(route('time.destroy', { time: id })).then(() => this.load())
+			axios.delete(this.route('time.destroy', { time: id })).then(() => this.load())
 		},
 
 		store() {
-			axios.post(route('time.store'), this.entry).then(() => this.load())
+			axios.post(this.route('time.store'), this.entry).then(() => this.load())
 		},
 
 		async load() {
-			return axios.get(route('time.index'), { week: this.currentWeek, year: this.currentYear }).then(res => {
+			return axios.get(this.route('time.index'), { week: this.currentWeek, year: this.currentYear }).then(res => {
 				this.weekSelector = res.data.year + '-W' + res.data.week
 				this.setData(res.data)
 			})

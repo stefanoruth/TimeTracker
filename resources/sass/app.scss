@@ -3,6 +3,10 @@
 @tailwind utilities;
 
 body {
-    height: 100%;
-    overflow: hidden;
+	height: 100%;
+	overflow: hidden;
+}
+
+.top-100 {
+	top: 100%;
 }
