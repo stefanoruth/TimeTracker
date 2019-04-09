@@ -35,6 +35,7 @@ class TimeRegistrationController extends Controller
 
 
             return array_merge($item, [
+                'date_short' => date('d/m', strtotime($item['date'])),
                 'totalTime' => $this->formatTime($entries->where('vacation', 0)->sum(function ($entry) {
                     [$hours, $min] = explode(':', $entry->time);
 
@@ -124,6 +125,8 @@ class TimeRegistrationController extends Controller
             'vacation' => 'required|boolean',
             'include_lunch' => 'required|boolean',
         ]);
+
+        dump($data);
 
         return Auth::user()->timeRegistrations()->create(
             $data

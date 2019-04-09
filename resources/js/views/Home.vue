@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col h-full">
-        <div class="container mx-auto px-2 py-4 flex justify-between">
+        <div class="container mx-auto px-2 py-4 flex justify-between border-b">
             <div class="text-2xl">Uge {{currentWeek}}, {{currentYear}}</div>
             <input class="w-48 h-12 border px-2" type="week" v-model="weekSelector">
         </div>
@@ -8,7 +8,11 @@
         <div class="container mx-auto px-2 py-4 flex">
             <input class="px-2 py-1 border" type="time" name="start" v-model="entry.start">
             <input class="px-2 py-1 border" type="time" name="end" v-model="entry.end">
-            <textarea class="px-2 py-1 border h-10 flex-1" placeholder="Note..."></textarea>
+            <textarea
+                class="px-2 py-1 border h-10 flex-1"
+                placeholder="Note..."
+                v-model="entry.note"
+            ></textarea>
             <label class="px-2 py-1 border flex justify-center items-center">
                 <span class="pr-2">Lunch break</span>
                 <input type="checkbox" v-model="entry.include_lunch">
@@ -22,22 +26,28 @@
         </div>
 
         <div class="flex-1 container mx-auto px-2">
-            <div v-for="(item, key) in dates" :key="key" class="border-b mb-4">
-                <div class="flex justify-between">
-                    <div class="text-xl">{{item.weekDay}}</div>
+            <div v-for="(item, key) in dates" :key="key" class="mb-8">
+                <div class="flex justify-between items-center py-2 border-t border-b">
+                    <div class="pr-4">
+                        <span class="text-xl">{{item.weekDay}}</span>
+                        <span>({{item.date_short}})</span>
+                    </div>
                     <div>Timer: {{item.totalTime}}</div>
                 </div>
                 <div>
                     <table class="w-full table-fixed">
                         <tbody>
-                            <tr v-for="(entry, i) in item.registrations" :key="i">
+                            <tr
+                                v-for="(entry, i) in item.registrations"
+                                :key="i"
+                                class="hover:bg-blue-100"
+                            >
                                 <td>{{entry.start}}</td>
                                 <td>{{entry.end}}</td>
                                 <td>{{entry.note}}</td>
                                 <td>{{entry.include_lunch ? 'Lunch' : 'No lunch'}}</td>
                                 <td>{{entry.vacation ? 'vecation': 'just work'}}</td>
                                 <td>{{entry.time}}</td>
-                                <td></td>
                                 <td>
                                     <button @click="destroy(entry.id)">X</button>
                                 </td>
@@ -112,7 +122,8 @@ export default {
 			axios.post(this.route('time.store'), this.entry).then(() => this.load())
 		},
 
-		async load() {
+		load() {
+			console.log({ week: this.currentWeek, year: this.currentYear })
 			return axios.get(this.route('time.index'), { week: this.currentWeek, year: this.currentYear }).then(res => {
 				this.weekSelector = res.data.year + '-W' + res.data.week
 				this.setData(res.data)
