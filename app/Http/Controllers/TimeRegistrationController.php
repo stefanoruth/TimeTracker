@@ -46,8 +46,8 @@ class TimeRegistrationController extends Controller
         });
 
         return [
-            'week' => $date->format('W'),
-            'year' => $date->format('Y'),
+            'week' => $request->get('week', date('W')),
+            'year' => $request->get('year', date('Y')),
             'weekHours' => $this->weekHours($days),
             'flex' => $this->flex(),
             'time' => $days,

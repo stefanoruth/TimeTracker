@@ -5,24 +5,40 @@
             <input class="w-48 h-12 border px-2" type="week" v-model="weekSelector">
         </div>
 
-        <div class="container mx-auto px-2 py-4 flex">
-            <input class="px-2 py-1 border" type="time" name="start" v-model="entry.start">
-            <input class="px-2 py-1 border" type="time" name="end" v-model="entry.end">
+        <div class="container mx-auto px-2 py-4 sm:flex">
+            <div class="flex">
+                <input
+                    class="px-2 py-1 border w-full sm:w-auto"
+                    type="time"
+                    name="start"
+                    v-model="entry.start"
+                >
+                <input
+                    class="px-2 py-1 border w-full sm:w-auto"
+                    type="time"
+                    name="end"
+                    v-model="entry.end"
+                >
+            </div>
             <textarea
-                class="px-2 py-1 border h-10 flex-1"
+                class="px-2 py-1 border h-10 flex-1 w-full"
                 placeholder="Note..."
                 v-model="entry.note"
             ></textarea>
-            <label class="px-2 py-1 border flex justify-center items-center">
-                <span class="pr-2">Lunch break</span>
-                <input type="checkbox" v-model="entry.include_lunch">
-            </label>
-            <label class="px-2 py-1 border flex justify-center items-center">
-                <span class="pr-2">Vacation</span>
-                <input type="checkbox" v-model="entry.vacation">
-            </label>
-            <input class="px-2 py-1 border" type="date" v-model="entry.date">
-            <button class="bg-blue-500 px-4 py-1 text-white" @click="store">Save</button>
+            <div class="flex">
+                <label class="px-2 py-1 border flex justify-center items-center w-full sm:w-auto">
+                    <span class="pr-2">Lunch break</span>
+                    <input type="checkbox" v-model="entry.include_lunch">
+                </label>
+                <label class="px-2 py-1 border flex justify-center items-center w-full sm:w-auto">
+                    <span class="pr-2">Vacation</span>
+                    <input type="checkbox" v-model="entry.vacation">
+                </label>
+            </div>
+            <div class="flex">
+                <input class="flex-1 px-2 py-1 border" type="date" v-model="entry.date">
+                <button class="flex-1 bg-blue-500 px-4 py-1 text-white" @click="store">Save</button>
+            </div>
         </div>
 
         <div class="flex-1 container mx-auto px-2">
@@ -40,16 +56,18 @@
                             <tr
                                 v-for="(entry, i) in item.registrations"
                                 :key="i"
-                                class="hover:bg-blue-100"
+                                class="hover:bg-blue-100 group"
                             >
-                                <td>{{entry.start}}</td>
-                                <td>{{entry.end}}</td>
-                                <td>{{entry.note}}</td>
-                                <td>{{entry.include_lunch ? 'Lunch' : 'No lunch'}}</td>
-                                <td>{{entry.vacation ? 'vecation': 'just work'}}</td>
-                                <td>{{entry.time}}</td>
-                                <td>
-                                    <button @click="destroy(entry.id)">X</button>
+                                <td class="py-2 px-4">{{entry.start}} - {{entry.end}}</td>
+                                <td class="py-2 px-4">{{entry.note}}</td>
+                                <td class="py-2 px-4">{{entry.include_lunch ? 'Lunch' : 'No lunch'}}</td>
+                                <td class="py-2 px-4">{{entry.vacation ? 'Vecation': 'Work'}}</td>
+                                <td class="py-2 px-4">{{entry.time}}</td>
+                                <td class="w-12">
+                                    <button
+                                        class="invisible group-hover:visible py-2 px-4"
+                                        @click="destroy(entry.id)"
+                                    >X</button>
                                 </td>
                             </tr>
                         </tbody>
@@ -95,6 +113,7 @@ export default {
 			const d = val.split('-W')
 
 			axios.get(this.route('time.index', { week: d[1], year: d[0] })).then(res => {
+				console.log(res.data, d)
 				this.setData(res.data)
 			})
 		},
@@ -123,9 +142,8 @@ export default {
 		},
 
 		load() {
-			console.log({ week: this.currentWeek, year: this.currentYear })
-			return axios.get(this.route('time.index'), { week: this.currentWeek, year: this.currentYear }).then(res => {
-				this.weekSelector = res.data.year + '-W' + res.data.week
+			return axios.get(this.route('time.index', { week: this.currentWeek, year: this.currentYear })).then(res => {
+				this.weekSelector = `${res.data.year}-W${res.data.week}`
 				this.setData(res.data)
 			})
 		},

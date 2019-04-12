@@ -1,11 +1,11 @@
 module.exports = {
-  theme: {
-    // Some useful comment
-  },
-  variants: {
-    // Some useful comment
-  },
-  plugins: [
-    // Some useful comment
-  ]
+	theme: {
+		// Some useful comment
+	},
+	variants: {
+		visibility: ['group-hover'],
+	},
+	plugins: [
+		// Some useful comment
+	],
 }
