@@ -30,12 +30,27 @@ class TimeRegistrationController extends Controller
             ->get()
             ->groupBy('date');
 
-        $days = $dateMap->map(function ($item) use ($registations) {
+        $today = strtotime(date('Y-m-d'));
+
+        $days = $dateMap->map(function ($item) use ($registations, $today) {
             $entries = $registations->get($item['date']) ?? new Collection();
 
 
+            if (strtotime($item['date']) == $today) {
+                $state = 'now';
+            } elseif (strtotime($item['date']) < $today) {
+                $state = 'past';
+            } elseif (strtotime($item['date']) > $today) {
+                $state = 'future';
+            } else {
+                $state = null;
+            }
+
+
             return array_merge($item, [
+                'date' => $item['date'],
                 'date_short' => date('d/m', strtotime($item['date'])),
+                'state' => $state,
                 'totalTime' => $this->formatTime($entries->where('vacation', 0)->sum(function ($entry) {
                     [$hours, $min] = explode(':', $entry->time);
 
@@ -57,12 +72,14 @@ class TimeRegistrationController extends Controller
     public function flex()
     {
         $user = Auth::user();
-        $timeRegistered = $user->timeRegistrations()->select(DB::raw("SUM(DATE_FORMAT(time, '%k')*60+DATE_FORMAT(time, '%i')) as flex"))->whereDate('date', '!=', date('Y-m-d'))->value('flex');
+        $timeRegistered = $user->timeRegistrations()->select(DB::raw("SUM(DATE_FORMAT(time, '%k')*60+DATE_FORMAT(time, '%i')) as flex"))->whereDate('date', '<=', date('Y-m-d'))->value('flex');
         $week = [1=>'monday', 2=>'tuesday', 3=>'wednesday', 4=>'thursday', 5=>'friday', 6=>'saturday', 7=>'sunday'];
 
-        $workTimeThisWeek = Collection::make($user->settings->days)->map(function ($active, $day) {
+        $settings = Collection::make($user->settings->days)->map(function ($active, $day) {
             return compact('day', 'active');
-        })->map(function ($item) use ($user, $week) {
+        });
+
+        $workTimeThisWeek =  $settings->map(function ($item) use ($user, $week) {
             $i = array_search($item['day'], $week);
 
             if (!$item['active']) {
@@ -75,10 +92,22 @@ class TimeRegistrationController extends Controller
             return $user->workPrDay();
         })->sum();
 
-        $weeksSignedUp = $user->created_at->diffInWeeks(Carbon::now());
+
+        $weeksSignedUp = Carbon::createFromFormat('Y-m-d', $user->timeRegistrations()->orderBy('date', 'ASC')->value('date'))->diffInWeeks(Carbon::now());
         $shouldWorkedMins = $user->settings->work * $weeksSignedUp + $workTimeThisWeek;
 
+        $todayEntries = $user-> timeRegistrations()->whereDate('date', '=', date('Y-m-d'))->count();
+        if ($todayEntries > 0) {
+            $shouldWorkedMins += $user->workPrDay();
+        }
+
         $flex = $timeRegistered - $shouldWorkedMins;
+
+        dump($timeRegistered);
+        dump($workTimeThisWeek);
+        dump($weeksSignedUp);
+        dump($shouldWorkedMins);
+        dump($flex);
 
         return $this->formatTime($flex);
     }
