@@ -103,12 +103,6 @@ class TimeRegistrationController extends Controller
 
         $flex = $timeRegistered - $shouldWorkedMins;
 
-        dump($timeRegistered);
-        dump($workTimeThisWeek);
-        dump($weeksSignedUp);
-        dump($shouldWorkedMins);
-        dump($flex);
-
         return $this->formatTime($flex);
     }
 
