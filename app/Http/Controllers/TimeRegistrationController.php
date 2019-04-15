@@ -92,9 +92,15 @@ class TimeRegistrationController extends Controller
             return $user->workPrDay();
         })->sum();
 
+        $shouldWorkedMins = $workTimeThisWeek;
 
-        $weeksSignedUp = Carbon::createFromFormat('Y-m-d', $user->timeRegistrations()->orderBy('date', 'ASC')->value('date'))->diffInWeeks(Carbon::now());
-        $shouldWorkedMins = $user->settings->work * $weeksSignedUp + $workTimeThisWeek;
+        $firstEntry = $user->timeRegistrations()->orderBy('date', 'ASC')->value('date');
+
+        if ($firstEntry) {
+            $weeksSignedUp = Carbon::createFromFormat('Y-m-d', $firstEntry)->diffInWeeks(Carbon::now());
+
+            $shouldWorkedMins += $user->settings->work * $weeksSignedUp;
+        }
 
         $todayEntries = $user-> timeRegistrations()->whereDate('date', '=', date('Y-m-d'))->count();
         if ($todayEntries > 0) {
