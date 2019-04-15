@@ -149,8 +149,6 @@ class TimeRegistrationController extends Controller
             'include_lunch' => 'required|boolean',
         ]);
 
-        dump($data);
-
         return Auth::user()->timeRegistrations()->create(
             $data
         );
